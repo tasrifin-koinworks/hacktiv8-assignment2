@@ -66,7 +66,7 @@ func (o *OrderController) GetAllOrdersWithItems(c *gin.Context) {
 }
 
 func (o *OrderController) UpdateOrder(c *gin.Context) {
-	var req params.AllResponseData
+	var req params.CreateOrder
 	orderId, err := strconv.Atoi(c.Param("orderId"))
 
 	if err != nil {
@@ -102,6 +102,14 @@ func (o *OrderController) UpdateOrder(c *gin.Context) {
 
 	if updateOrderResponse.Status != http.StatusOK {
 		c.JSON(updateOrderResponse.Status, updateOrderResponse)
+		return
+	}
+
+	getItemById, _ := o.itemService.GetItemsByOrderID(orderId)
+
+	updateItemResponse := o.itemService.UpdateItemByID(getItemById, req)
+	if updateItemResponse.Status != http.StatusOK {
+		c.JSON(updateOrderResponse.Status, updateItemResponse)
 		return
 	}
 

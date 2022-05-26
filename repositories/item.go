@@ -28,7 +28,7 @@ func (i *itemRepo) CreateItem(item *models.Item) (*models.Item, error) {
 func (i *itemRepo) GetItemsByOrderID(orderId int) (*[]models.Item, error) {
 	var items []models.Item
 
-	err := i.db.Where(&items, "order_id=?", orderId).Error
+	err := i.db.Where("order_id=?", orderId).Find(&items).Error
 	return &items, err
 }
 
@@ -38,6 +38,7 @@ func (i *itemRepo) UpdateItemByID(id int, updateItem *models.Item) (*models.Item
 	err := i.db.Model(&item).Where("id=?", id).Updates(updateItem).Error
 	return &item, err
 }
+
 func (i *itemRepo) DeleteItem(orderId int) error {
 	var item models.Item
 

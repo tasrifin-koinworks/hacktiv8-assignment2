@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"hacktiv8-assignment2/models"
 	"hacktiv8-assignment2/params"
 	"hacktiv8-assignment2/repositories"
@@ -91,7 +90,6 @@ func (o *OrderService) GetAllOrdersWithItems() *params.Response {
 
 func (o *OrderService) GetOrderByID(orderId int) *params.Response {
 	response, err := o.orderRepo.GetOrderByID(orderId)
-	fmt.Println(err)
 	if err != nil {
 		return &params.Response{
 			Status:         http.StatusNotFound,
@@ -107,9 +105,8 @@ func (o *OrderService) GetOrderByID(orderId int) *params.Response {
 	}
 }
 
-func (o *OrderService) UpdateOrderByID(orderId int, request params.AllResponseData) *params.Response {
+func (o *OrderService) UpdateOrderByID(orderId int, request params.CreateOrder) *params.Response {
 	_, err := o.orderRepo.GetOrderByID(orderId)
-	fmt.Println(err)
 	if err != nil {
 		return &params.Response{
 			Status:         http.StatusNotFound,

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"hacktiv8-assignment2/models"
 	"hacktiv8-assignment2/params"
 	"hacktiv8-assignment2/repositories"
@@ -44,7 +43,6 @@ func (i *ItemService) CreateItem(responseOrder params.Response, request params.C
 			OrderId:     uint(order.ID),
 		}
 
-		fmt.Println(&itemModel)
 		itemData, err := i.itemRepo.CreateItem(&itemModel)
 
 		if err != nil {
@@ -74,33 +72,53 @@ func (i *ItemService) CreateItem(responseOrder params.Response, request params.C
 	}
 }
 
-func (i *ItemService) GetItemsByOrderID(orderId int) *params.Response {
+func (i *ItemService) GetItemsByOrderID(orderId int) (*[]models.Item, *params.Response) {
 	response, err := i.itemRepo.GetItemsByOrderID(orderId)
-	fmt.Println(err)
 	if err != nil {
-		return &params.Response{
+		return response, &params.Response{
 			Status:         http.StatusNotFound,
 			Error:          "Error - Item Not Found",
 			AdditionalInfo: err.Error(),
 		}
 	}
 
-	return &params.Response{
+	return response, &params.Response{
 		Status:  http.StatusOK,
 		Message: "Success",
 		Payload: response,
 	}
 }
 
-func (i *ItemService) UpdateItemByID(orderId int, request params.AllResponseData) *params.Response {
-	// _, err := i.ItemService.GetOrderByID(orderId)
-	// fmt.Println(err)
-	// if err != nil {
-	return &params.Response{
-		Status: http.StatusNotFound,
-		Error:  "Error - Item Not Found",
+func (i *ItemService) UpdateItemByID(itemModel *[]models.Item, request params.CreateOrder) *params.Response {
+
+	items := request.Items
+
+	for _, v := range *itemModel {
+		for _, itemRequest := range items {
+			if v.ID == uint(itemRequest.ItemID) {
+				updateItem := models.Item{
+					ItemCode:    itemRequest.ItemCode,
+					Description: itemRequest.Description,
+					Quantity:    itemRequest.Quantity,
+				}
+
+				_, err := i.itemRepo.UpdateItemByID(itemRequest.ItemID, &updateItem)
+
+				if err != nil {
+					return &params.Response{
+						Status:         400,
+						Error:          "BAD REQUEST",
+						AdditionalInfo: err,
+					}
+				}
+			}
+		}
 	}
-	// }
+
+	return &params.Response{
+		Status:  200,
+		Message: "Success - Update Order & Items",
+	}
 }
 
 func (i *ItemService) DeleteItems(orderId int) *params.Response {
